@@ -1,16 +1,57 @@
 import os 
+import numpy as np 
+from PIL import Image
+import random
+
+random.seed(42)
+
+images_location = "extracted_images"
+possible_classes = [name for name in os.listdir(images_location) if os.path.isdir(os.path.join(images_location, name))]
+
+desired_symbols = set(["-", "+", "X", "0", '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '='])
+
+possible_classes_totals = []
+for possible_class in possible_classes:
+	names = [name for name in os.listdir(os.path.join(images_location, possible_class)) if not name.startswith(".")]
+	possible_classes_totals.append((possible_class, len(names)))
+
+possible_classes_totals = sorted(possible_classes_totals, key=lambda x: x[0])
+possible_classes_totals = [total for total in possible_classes_totals if total[0] in desired_symbols]
+
+print(possible_classes_totals, len(possible_classes_totals), sum(possible_class[1] for possible_class in possible_classes_totals))
+assert(len(possible_classes_totals) == len(desired_symbols))
+
+def format_np_array(images):
+	images = (np.array(images).astype(np.float32) - 127.5) / 127.5
+	images = images.reshape((-1, 45, 45))
+	images = np.expand_dims(images, axis=1)
+	return images
 
 def get_math_dataset():
-	images_location = "extracted_images"
-	possible_classes = [name for name in os.listdir(images_location) if os.path.isdir(os.path.join(images_location, name))]
-	possible_classes_totals = []
-	for possible_class in possible_classes:
-		names = [name for name in os.listdir(os.path.join(images_location, possible_class)) if not name.startswith(".")]
-		possible_classes_totals.append((possible_class, len(names)))
-	possible_classes_totals = sorted(possible_classes_totals, key=lambda x: x[1], reverse=True)
-	print(possible_classes_totals, len(possible_classes_totals), sum(possible_class[1] for possible_class in possible_classes_totals))
-	possible_classes_totals = [total for total in possible_classes_totals if total[1] > 2000]
-	print()
-	print(possible_classes_totals, len(possible_classes_totals), sum(possible_class[1] for possible_class in possible_classes_totals))
+	max_images = 2909
+	labeled_images = []
+	for i, symbol_pair in enumerate(possible_classes_totals):
+		filenames = [os.path.join(images_location, symbol_pair[0], name) for name in os.listdir(os.path.join(images_location, symbol_pair[0])) if not name.startswith(".")]
+		random.shuffle(filenames)
+		filenames = filenames[:2909]
+		images = [np.array(Image.open(filename).getdata()) for filename in filenames]
+		curr_labeled_images = zip(images, [i] * len(images))
+		labeled_images.extend(curr_labeled_images)
 
-get_math_dataset()
+	random.shuffle(labeled_images)
+
+	print(np.array(labeled_images).shape)
+
+	x, y = zip(*labeled_images)
+	x = format_np_array(x)
+	y = np.array(y)
+
+	test_x = x[:int(x.shape[0] / 10)]
+	train_x = x[int(x.shape[0] / 10):]
+
+	test_y = y[:int(y.shape[0] / 10)]
+	train_y = y[int(y.shape[0] / 10):]
+
+	print(x.shape, y.shape, train_x.shape, train_y.shape, test_x.shape, test_y.shape)
+	return train_x, train_y, test_x, test_y
+
