@@ -3,9 +3,16 @@ import numpy as np
 from PIL import Image
 import random
 
+### TENSORPORT SUPPORT
+
+from tensorport import get_data_path
+
+images_location = get_data_path(local_root=".", dataset_name="karan1149/math", local_repo="extracted_images", path="")
+
+###
+
 random.seed(42)
 
-images_location = "extracted_images"
 possible_classes = [name for name in os.listdir(images_location) if os.path.isdir(os.path.join(images_location, name))]
 
 desired_symbols = set(["-", "+", "X", "0", '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '='])
