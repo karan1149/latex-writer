@@ -58,13 +58,13 @@ outputs_path = get_logs_path(root="outputs/")
 
 ###
 
-num_classes = 10
+num_classes = image_utils.NUM_CLASSES
 image_size = 28
 
 
 def build_generator(latent_size):
     # we will map a pair of (z, L), where z is a latent vector and L is a
-    # label drawn from P_c, to image space (..., 1, 45, 45)
+    # label drawn from P_c, to image space (..., 1, image_size, image_size)
     cnn = Sequential()
 
     cnn.add(Dense(1024, input_dim=latent_size, activation='relu'))
@@ -98,6 +98,8 @@ def build_generator(latent_size):
     h = multiply([latent, cls])
 
     fake_image = cnn(h)
+
+    print(cnn.summary())
 
     return Model(input=[latent, image_class], output=fake_image)
 
@@ -155,6 +157,7 @@ if __name__ == '__main__':
 
     # build the discriminator
     discriminator = build_discriminator()
+    print(discriminator.summary())
     discriminator.compile(
         optimizer=Adam(lr=adam_lr, beta_1=adam_beta_1),
         loss=['binary_crossentropy', 'sparse_categorical_crossentropy']
@@ -162,6 +165,7 @@ if __name__ == '__main__':
 
     # build the generator
     generator = build_generator(latent_size)
+    print(generator.summary())
     generator.compile(optimizer=Adam(lr=adam_lr, beta_1=adam_beta_1),
                       loss='binary_crossentropy')
 
@@ -183,12 +187,7 @@ if __name__ == '__main__':
 
     # get our mnist data, and force it to be of shape (..., 1, 28, 28) with
     # range [-1, 1]
-    (X_train, y_train), (X_test, y_test) = mnist.load_data()
-    X_train = (X_train.astype(np.float32) - 127.5) / 127.5
-    X_train = np.expand_dims(X_train, axis=1)
-
-    X_test = (X_test.astype(np.float32) - 127.5) / 127.5
-    X_test = np.expand_dims(X_test, axis=1)
+    X_train, y_train, X_test, y_test = image_utils.get_math_dataset()
 
     nb_train, nb_test = X_train.shape[0], X_test.shape[0]
 
