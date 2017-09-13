@@ -9,6 +9,7 @@ images_location = "extracted_images"
 possible_classes = [name for name in os.listdir(images_location) if os.path.isdir(os.path.join(images_location, name))]
 
 desired_symbols = set(["-", "+", "X", "0", '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '='])
+NUM_CLASSES = len(desired_symbols)
 
 possible_classes_totals = []
 for possible_class in possible_classes:
@@ -23,7 +24,7 @@ assert(len(possible_classes_totals) == len(desired_symbols))
 
 def format_np_array(images):
 	images = (np.array(images).astype(np.float32) - 127.5) / 127.5
-	images = images.reshape((-1, 45, 45))
+	images = images.reshape((-1, 28, 28))
 	images = np.expand_dims(images, axis=1)
 	return images
 
@@ -34,7 +35,7 @@ def get_math_dataset():
 		filenames = [os.path.join(images_location, symbol_pair[0], name) for name in os.listdir(os.path.join(images_location, symbol_pair[0])) if not name.startswith(".")]
 		random.shuffle(filenames)
 		filenames = filenames[:2909]
-		images = [np.array(Image.open(filename).getdata()) for filename in filenames]
+		images = [np.array(Image.open(filename).resize((28, 28)).getdata()) for filename in filenames]
 		curr_labeled_images = zip(images, [i] * len(images))
 		labeled_images.extend(curr_labeled_images)
 
@@ -52,6 +53,5 @@ def get_math_dataset():
 	test_y = y[:int(y.shape[0] / 10)]
 	train_y = y[int(y.shape[0] / 10):]
 
-	print(x.shape, y.shape, train_x.shape, train_y.shape, test_x.shape, test_y.shape)
 	return train_x, train_y, test_x, test_y
 
