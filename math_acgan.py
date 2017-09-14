@@ -59,7 +59,7 @@ outputs_path = get_logs_path(root="outputs/")
 ###
 
 num_classes = image_utils.NUM_CLASSES
-image_size = 48
+image_size = 28
 
 
 def build_generator(latent_size):
@@ -68,8 +68,8 @@ def build_generator(latent_size):
     cnn = Sequential()
 
     cnn.add(Dense(1024, input_dim=latent_size, activation='relu'))
-    cnn.add(Dense(128 * 12 * 12, activation='relu'))
-    cnn.add(Reshape((128, 12, 12)))
+    cnn.add(Dense(128 * 7 * 7, activation='relu'))
+    cnn.add(Reshape((128, 7, 7)))
 
     # upsample to (..., 14, 14)
     cnn.add(UpSampling2D(size=(2, 2)))

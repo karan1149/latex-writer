@@ -31,7 +31,7 @@ assert(len(possible_classes_totals) == len(desired_symbols))
 
 def format_np_array(images):
 	images = (np.array(images).astype(np.float32) - 127.5) / 127.5
-	images = images.reshape((-1, 48, 48))
+	images = images.reshape((-1, 28, 28))
 	images = np.expand_dims(images, axis=1)
 	return images
 
@@ -42,7 +42,7 @@ def get_math_dataset():
 		filenames = [os.path.join(images_location, symbol_pair[0], name) for name in os.listdir(os.path.join(images_location, symbol_pair[0])) if not name.startswith(".")]
 		random.shuffle(filenames)
 		filenames = filenames[:2909]
-		images = [np.array(Image.open(filename).resize((48, 48)).getdata()) for filename in filenames]
+		images = [np.array(Image.open(filename).getdata()) for filename in filenames]
 		curr_labeled_images = zip(images, [i] * len(images))
 		labeled_images.extend(curr_labeled_images)
 
