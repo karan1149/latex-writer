@@ -42,7 +42,7 @@ def get_math_dataset():
 		filenames = [os.path.join(images_location, symbol_pair[0], name) for name in os.listdir(os.path.join(images_location, symbol_pair[0])) if not name.startswith(".")]
 		random.shuffle(filenames)
 		filenames = filenames[:2909]
-		images = [np.array(Image.open(filename).getdata()) for filename in filenames]
+		images = [np.array(Image.open(filename).convert("L").getdata()) for filename in filenames]
 		curr_labeled_images = zip(images, [i] * len(images))
 		labeled_images.extend(curr_labeled_images)
 

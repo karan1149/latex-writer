@@ -190,6 +190,8 @@ if __name__ == '__main__':
     # get our mnist data, and force it to be of shape (..., 1, 28, 28) with
     # range [-1, 1]
     X_train, y_train, X_test, y_test = image_utils.get_math_dataset()
+    print("Data shapes")
+    print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
 
     nb_train, nb_test = X_train.shape[0], X_test.shape[0]
 
