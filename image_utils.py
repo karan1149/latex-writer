@@ -65,17 +65,15 @@ def get_math_dataset():
 	test_y = y[:int(y.shape[0] / 10)]
 	train_y = y[int(y.shape[0] / 10):]
 
+	classes_counts = np.array(classes_counts).astype(np.float32)
 
-	classes_sum = sum(classes_counts)
-	classes_distribution = np.array(classes_counts) / classes_sum
+	classes_sum = classes_counts.sum()
+	classes_distribution = classes_counts / classes_sum
 
-	# avoid rounding errors
-	np.around(classes_distribution, decimals=6)
-	assert(sum(classes_distribution) == 1)
+	print(classes_distribution, classes_distribution.sum())
+	assert(classes_distribution.sum() == 1)
 
 	print("distribution:", classes_distribution)
 
 	return train_x, train_y, test_x, test_y, classes_distribution
-
-get_math_dataset()
 
