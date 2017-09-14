@@ -38,21 +38,26 @@ def format_np_array(images):
 def get_math_dataset():
 	max_images = 2909
 	labeled_images = []
+	classes_counts = []
 	for i, symbol_pair in enumerate(possible_classes_totals):
 		filenames = [os.path.join(images_location, symbol_pair[0], name) for name in os.listdir(os.path.join(images_location, symbol_pair[0])) if not name.startswith(".")]
 		random.shuffle(filenames)
 		filenames = filenames[:2909]
 		images = [np.array(Image.open(filename).convert("L").getdata()) for filename in filenames]
 		curr_labeled_images = zip(images, [i] * len(images))
+		classes_counts.append(len(images))
 		labeled_images.extend(curr_labeled_images)
+	print(classes_counts)
 
 	random.shuffle(labeled_images)
 
 	print(np.array(labeled_images).shape)
+	print(labeled_images[0][0].shape)
 
 	x, y = zip(*labeled_images)
 	x = format_np_array(x)
 	y = np.array(y)
+	print(x.shape, y.shape)
 
 	test_x = x[:int(x.shape[0] / 10)]
 	train_x = x[int(x.shape[0] / 10):]
@@ -60,5 +65,12 @@ def get_math_dataset():
 	test_y = y[:int(y.shape[0] / 10)]
 	train_y = y[int(y.shape[0] / 10):]
 
-	return train_x, train_y, test_x, test_y
+	classes_min = min(classes_counts)
+	classes_distribution = np.array(classes_counts) / classes_min
+
+	print("distribution:", classes_distribution)
+
+	return train_x, train_y, test_x, test_y, classes_distribution
+
+get_math_dataset()
 

@@ -61,6 +61,9 @@ outputs_path = get_logs_path(root="outputs/")
 num_classes = image_utils.NUM_CLASSES
 image_size = 28
 
+def get_weighted_class(classes_distribution, size=None):
+    return np.random.choice(range(len(classes_distribution)), p=classes_distribution, size=size)
+
 
 def build_generator(latent_size):
     # we will map a pair of (z, L), where z is a latent vector and L is a
@@ -189,7 +192,7 @@ if __name__ == '__main__':
 
     # get our mnist data, and force it to be of shape (..., 1, 28, 28) with
     # range [-1, 1]
-    X_train, y_train, X_test, y_test = image_utils.get_math_dataset()
+    X_train, y_train, X_test, y_test, classes_distribution = image_utils.get_math_dataset()
     print("Data shapes")
     print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
 
@@ -217,7 +220,7 @@ if __name__ == '__main__':
             label_batch = y_train[index * batch_size:(index + 1) * batch_size]
 
             # sample some labels from p_c
-            sampled_labels = np.random.randint(0, num_classes, batch_size)
+            sampled_labels = get_weighted_class(classes_distribution, batch_size)
 
             # generate a batch of fake images, using the generated labels as a
             # conditioner. We reshape the sampled labels to be
@@ -237,7 +240,7 @@ if __name__ == '__main__':
             # the generator optimize over an identical number of images as the
             # discriminator
             noise = np.random.uniform(-1, 1, (2 * batch_size, latent_size))
-            sampled_labels = np.random.randint(0, num_classes, 2 * batch_size)
+            sampled_labels = get_weighted_class(classes_distribution, 2 * batch_size)
 
             # we want to train the generator to trick the discriminator
             # For the generator, we want all the {fake, not-fake} labels to say
@@ -255,7 +258,7 @@ if __name__ == '__main__':
         noise = np.random.uniform(-1, 1, (nb_test, latent_size))
 
         # sample some labels from p_c and generate images from them
-        sampled_labels = np.random.randint(0, num_classes, nb_test)
+        sampled_labels = get_weighted_class(classes_distribution, nb_test)
         generated_images = generator.predict(
             [noise, sampled_labels.reshape((-1, 1))], verbose=False)
 
@@ -271,7 +274,7 @@ if __name__ == '__main__':
 
         # make new noise
         noise = np.random.uniform(-1, 1, (2 * nb_test, latent_size))
-        sampled_labels = np.random.randint(0, num_classes, 2 * nb_test)
+        sampled_labels = get_weighted_class(classes_distribution, 2 * nb_test)
 
         trick = np.ones(2 * nb_test)
 
