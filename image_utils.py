@@ -7,7 +7,7 @@ import random
 
 from tensorport import get_data_path
 
-images_location = get_data_path(local_root=".", dataset_name="karan1149/math-data", local_repo="extracted_images", path="")
+images_location = get_data_path(local_root=".", dataset_name="karan1149/math-data2", local_repo="extracted_images", path="")
 
 ###
 
