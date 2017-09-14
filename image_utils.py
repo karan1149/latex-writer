@@ -15,7 +15,7 @@ random.seed(42)
 
 possible_classes = [name for name in os.listdir(images_location) if os.path.isdir(os.path.join(images_location, name))]
 
-desired_symbols = set(["-", "+", "X", "0", '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '='])
+desired_symbols = set(["-", "+", "x", "0", '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '='])
 NUM_CLASSES = len(desired_symbols)
 
 possible_classes_totals = []
