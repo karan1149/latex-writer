@@ -337,7 +337,7 @@ if __name__ == '__main__':
 
         # arrange them into a grid
         img = (np.concatenate([r.reshape(-1, image_size)
-                               for r in np.split(generated_images, digits_to_display)
+                               for r in np.split(digits_to_display, generated_images)
                                ], axis=-1) * 127.5 + 127.5).astype(np.uint8)
 
         Image.fromarray(img).save(os.path.join(outputs_path, 
