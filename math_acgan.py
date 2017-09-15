@@ -45,6 +45,7 @@ from keras.utils.generic_utils import Progbar
 import numpy as np
 import os
 import image_utils
+from glob import glob
 
 np.random.seed(1337)
 
@@ -189,6 +190,17 @@ if __name__ == '__main__':
         optimizer=Adam(lr=adam_lr * 1.5, beta_1=adam_beta_1),
         loss=['binary_crossentropy', 'sparse_categorical_crossentropy']
     )
+
+    generator_filenames = sorted(glob('params_generator*'))
+    discriminator_filenames = sorted(glob('params_discriminator*'))
+
+    if generator_filenames and discriminator_filenames:
+        print("Loading models from file!")
+        # discriminator.layers[-2:-1] = [Concatenate(discriminator.layers[-1]), Concatenate(discriminator.layers[-2])]
+        # print(discriminator.layers)
+        generator.load_weights(generator_filenames[-1])
+        discriminator.load_weights(discriminator_filenames[-1])
+        print("Loaded models from file")
 
     # get our mnist data, and force it to be of shape (..., 1, 28, 28) with
     # range [-1, 1]
