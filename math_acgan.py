@@ -194,12 +194,14 @@ if __name__ == '__main__':
     generator_filenames = sorted(glob('params_generator*'))
     discriminator_filenames = sorted(glob('params_discriminator*'))
 
+    last_epoch = -1
     if generator_filenames and discriminator_filenames:
         print("Loading models from file!")
         # discriminator.layers[-2:-1] = [Concatenate(discriminator.layers[-1]), Concatenate(discriminator.layers[-2])]
         # print(discriminator.layers)
         generator.load_weights(generator_filenames[-1])
         discriminator.load_weights(discriminator_filenames[-1])
+        last_epoch = int(generator_filenames[-1][-8:-5])
         print("Loaded models from file")
 
     # get our mnist data, and force it to be of shape (..., 1, 28, 28) with
@@ -213,8 +215,8 @@ if __name__ == '__main__':
     train_history = defaultdict(list)
     test_history = defaultdict(list)
 
-    for epoch in range(nb_epochs):
-        print('Epoch {} of {}'.format(epoch + 1, nb_epochs))
+    for epoch in range(last_epoch + 1, last_epoch + 1 + nb_epochs):
+        print('Epoch {} of {}'.format(epoch - last_epoch, nb_epochs))
 
         nb_batches = int(X_train.shape[0] / batch_size)
         progress_bar = Progbar(target=nb_batches)
