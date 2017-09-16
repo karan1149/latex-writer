@@ -215,6 +215,8 @@ if __name__ == '__main__':
     train_history = defaultdict(list)
     test_history = defaultdict(list)
 
+    print("Last epoch", last_epoch)
+
     for epoch in range(last_epoch + 1, last_epoch + 1 + nb_epochs):
         print('Epoch {} of {}'.format(epoch - last_epoch, nb_epochs))
 
