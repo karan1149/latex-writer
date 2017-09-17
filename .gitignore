@@ -1,3 +1,4 @@
 extracted_images/
 outputs*
 *.pyc
+*.zip

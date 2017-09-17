@@ -55,7 +55,7 @@ K.set_image_dim_ordering('th')
 
 ### TENSORPORT SUPPORT
 
-outputs_path = outputs/
+outputs_path = "outputs/"
 
 ###
 
