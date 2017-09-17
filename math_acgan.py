@@ -347,8 +347,5 @@ if __name__ == '__main__':
         Image.fromarray(img).save(os.path.join(outputs_path, 
             'plot_epoch_{0:03d}_generated.png'.format(epoch)))
 
-        if epoch % 20 == 0:
-            shutil.make_archive(os.path.join(outputs_path, "assets_%d_%d" % (epoch, time.time())), 'zip', outputs_path)
-
     pickle.dump({'train': train_history, 'test': test_history},
                 open(os.path.join(outputs_path, 'acgan-history.pkl'), 'wb'))
