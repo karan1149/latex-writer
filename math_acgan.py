@@ -55,9 +55,7 @@ K.set_image_dim_ordering('th')
 
 ### TENSORPORT SUPPORT
 
-from tensorport import get_logs_path
-
-outputs_path = get_logs_path(root="outputs/")
+outputs_path = outputs/
 
 ###
 
@@ -155,7 +153,7 @@ if __name__ == '__main__':
         os.makedirs(outputs_path)
 
     # batch and latent size taken from the paper
-    nb_epochs = 50
+    nb_epochs = 100
     batch_size = 100
     latent_size = 100
 
