@@ -172,7 +172,7 @@ if __name__ == '__main__':
     # build the generator
     generator = build_generator(latent_size)
     print(generator.summary())
-    generator.compile(optimizer=Adam(lr=adam_lr, beta_1=adam_beta_1),
+    generator.compile(optimizer=Adam(lr=adam_lr * 2.0, beta_1=adam_beta_1),
                       loss='binary_crossentropy')
 
     latent = Input(shape=(latent_size, ))
@@ -187,7 +187,7 @@ if __name__ == '__main__':
     combined = Model(input=[latent, image_class], output=[fake, aux])
 
     combined.compile(
-        optimizer=Adam(lr=adam_lr, beta_1=adam_beta_1),
+        optimizer=Adam(lr=adam_lr * 2.0, beta_1=adam_beta_1),
         loss=['binary_crossentropy', 'sparse_categorical_crossentropy']
     )
 
