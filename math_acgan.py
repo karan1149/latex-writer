@@ -63,7 +63,7 @@ num_classes = image_utils.NUM_CLASSES
 image_size = 28
 
 def get_weighted_class(classes_distribution, size=None):
-    return np.random.choice(range(len(classes_distribution)), size=size)
+    return np.random.choice(range(len(classes_distribution)), p=classes_distribution, size=size)
 
 
 def build_generator(latent_size):
