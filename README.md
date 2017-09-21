@@ -24,8 +24,6 @@ The important properties of this dataset (for experimenting with the robustness 
 
 First, I ran the AC-GAN implementation as is on the new dataset. I had to change the Adam learning rate to 0.00005 from 0.0001 because model weights diverged otherwise. The results were significantly worse than on the MNIST dataset. After 100 epochs (around which the model errors began to hold roughly constant), we have the following plot:
 
-https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_partial_unoptimized_equal_lr/plot_epoch_099_generated.png
-
 ![CHROHME unoptimized plot with equal LR](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_partial_unoptimized_equal_lr/plot_epoch_099_generated.png)
 
 Each of 16 columns in this plot corresponds to a different symbol class. In order, these symbols are: "(", ")", "+", "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "=", "x". For each column, the model makes 10 attempts to generate the corresponding symbol. We can see that for this dataset, the model does relatively poorly. For most symbols, it has an idea of what they are supposed to look like, but for some symbols ("-", "0", "1", for instance), most of the generated images are pretty bad.
@@ -35,6 +33,8 @@ Looking at the training logs for this run, I noticed that the generator loss was
 To fix this, I tried using a different learning rate for the generator and the discriminator (generator has 1.5x learning rate), which gave significantly improved results after the same number of epochs:
 
 ![CHROHME unoptimized plot](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_partial_unoptimized/plot_epoch_099_generated.png)
+
+Notice the variation within class for some of the generated images: some of the "4"s and "7"s are written differently.
 
 I also tried setting the generator to have 2x the learning rate of the discriminator, but the results seem to be about the same:
 
@@ -47,7 +47,7 @@ Using a generator learning rate 1.5x greater than the discriminator learning rat
 ![CHROHME optimized plot](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_full_optimized/plot_epoch_099_generated.png)
 
 
-As you would expect, the model now does better in generating images for classes that are poorly represented in the training data ("6", "7", "8", "9" are all examples, as they all have <1000 training data examples, whereas all the other classes have >2000). However, this appears to be at the cost of performance on other symbols, most clearly "0" in this case. Since model error was still decreasing at 100 epochs, it is likely that this result could be improved by increasing the number of epochs, but it still demonstrates the relative inefficiency of training using this method. The results are worse if the generator learning rate is 2x greater than the discriminator learning rate:
+As you would expect, the model now does better in generating images for classes that are poorly represented in the training data ("6", "7", "8", "9" are all examples, as they all have <1000 training data examples, whereas all the other classes have >2000). However, this appears to be at the cost of performance on other symbols, most clearly "0" in this case. Since model error was still decreasing at 100 epochs, it is likely that this result could be improved by increasing the number of epochs, but it still demonstrates the relative inefficiency of training using this method. The results are a little worse if the generator learning rate is 2x greater than the discriminator learning rate:
 
 ![CHROHME optimized plot with 2x LR](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_partial_optimized_2x_lr/plot_epoch_099_generated.png)
 
