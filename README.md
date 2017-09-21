@@ -10,7 +10,7 @@ In brief, GANs work by training two networks: the generator G and the discrimina
 
 There have been many advances in GANs since their inception in 2014, and one of the more interesting (albeit simple) variants is [Auxiliary Classifier GANs](https://arxiv.org/abs/1610.09585). AC-GANs modify the generator so that it takes in the identity of a class of image to produce (a certain breed of dog, for instance) and modify the discriminator so that it also predicts the class given an image. The end result is a model that can produce new images of a desired class, as well as classify images. 
 
-I implemented a simplified version of AC-GANs in Keras (based on Luke de Oliveira's GAN code). The original GAN version works well with the MNIST dataset, generating plausible handwritten digits after 13 epochs:
+I implemented a simplified version of AC-GANs in Keras (based on Luke de Oliveira's GAN code). This works well with the MNIST dataset, generating plausible handwritten digits after 13 epochs:
 
 ![MNIST generated digits](https://github.com/karan1149/latex-writer/raw/master/model_outputs/mnist_digits_generated.png)
 
