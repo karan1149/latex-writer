@@ -1,4 +1,7 @@
 extracted_images/
-outputs*
+outputs/*
+outputs_downsized/*
 *.pyc
 *.zip
+model_outputs/*.hdf5
+*.hdf5
