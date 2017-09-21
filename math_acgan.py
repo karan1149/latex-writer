@@ -6,27 +6,8 @@ author: Karan Singhal
 
 Train an Auxiliary Classifier Generative Adversarial Network (ACGAN) on the
 CROHME dataset. See https://arxiv.org/abs/1610.09585 for more details. Adapted
-much of this code from Luke de Oliveira (lukedeo@vaitech.io). Beyond changing the 
-architecture of the model for the new dataset, my modifications were in improving the 
-performance of the model, mainly by avoiding needless replication of the 
-discriminator model. See [this blog post]
-(https://ctmakro.github.io/site/on_learning/fast_gan_in_keras.html) 
-for more information on the issue, and why it plagues nearly every implementation of GANs 
-with Keras. Also, some extra utilities for visualizing/interpreting results of training 
-for my needs were added.
+much of this code from Luke de Oliveira (lukedeo@vaitech.io).
 
-You should start to see reasonable images after ~5 epochs, and good images
-by ~15 epochs. You should use a GPU, as the convolution-heavy operations are
-very slow on the CPU. Prefer the TensorFlow backend if you plan on iterating, as
-the compilation time can be a blocker using Theano.
-
-Timings:
-
-Hardware           | Backend | Time / Epoch
--------------------------------------------
- CPU               | TF      | 3 hrs
- Titan X (maxwell) | TF      | 4 min
- Titan X (maxwell) | TH      | 7 min
 """
 from collections import defaultdict
 import pickle
@@ -172,7 +153,7 @@ if __name__ == '__main__':
     # build the generator
     generator = build_generator(latent_size)
     print(generator.summary())
-    generator.compile(optimizer=Adam(lr=adam_lr * 2.0, beta_1=adam_beta_1),
+    generator.compile(optimizer=Adam(lr=adam_lr * 1.5, beta_1=adam_beta_1),
                       loss='binary_crossentropy')
 
     latent = Input(shape=(latent_size, ))
@@ -187,7 +168,7 @@ if __name__ == '__main__':
     combined = Model(input=[latent, image_class], output=[fake, aux])
 
     combined.compile(
-        optimizer=Adam(lr=adam_lr * 2.0, beta_1=adam_beta_1),
+        optimizer=Adam(lr=adam_lr * 1.5, beta_1=adam_beta_1),
         loss=['binary_crossentropy', 'sparse_categorical_crossentropy']
     )
 
