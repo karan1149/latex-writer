@@ -1,6 +1,6 @@
 # LaTeX Writer
 
-The goal of this project is to learn more about and experiment with generative adversarial networks, an exciting new technique in machine learning. GANs are cool because they generate images that appear similar to training data, but are actually entirely new images. For example, if you train a GAN with images of dogs, after training the GAN will be able to generate completely new images of dogs! In a sense, the the neural network appears to be learning about what a dog is, more so than if it could just classify different breeds of dogs.
+The goal of this project is to learn more about and experiment with generative adversarial networks, an exciting new technique in machine learning. GANs are cool because they generate images that appear similar to training data, but are actually entirely new images. For example, if you train a GAN with images of dogs, after training the GAN will be able to generate completely new images of dogs! In a sense, the the neural network appears to be learning about what a dog is, more so than if it could just classify different breeds of dogs. This is a step toward machines that really appear to be intelligent!
 
 ## GANs
 
@@ -12,6 +12,8 @@ There have been many advances in GANs since their inception in 2014, and one of 
 
 I implemented a simplified version of AC-GANs in Keras (based on Luke de Oliveira's GAN code). The original GAN version works well with the MNIST dataset, generating plausible handwritten digits after 13 epochs:
 
+![MNIST generated digits](https://github.com/karan1149/latex-writer/raw/master/model_outputs/mnist_digits_generated.png)
+
 ## Dataset
 
 After implementing AC-GANs, I wanted to test with a different dataset, since the MNIST is a relatively simple dataset that often does not tell you much about whether a model will work on more complex data. That said, I do not have access to the computing power that I would need to train on and generate high resolution data (and generating high resolution output is still a work in progress with GANs), so I generated a dataset that fit my needs by building an [extractor](https://github.com/karan1149/crohme-data-extractor) for the CROHME dataset of handwritten mathematical expressions. 
@@ -22,6 +24,9 @@ The important properties of this dataset (for experimenting with the robustness 
 
 First, I ran the AC-GAN implementation as is on the new dataset. I had to change the Adam learning rate to 0.00005 from 0.0001 because model weights diverged otherwise. The results were significantly worse than on the MNIST dataset. After 100 epochs (around which the model errors began to hold roughly constant), we have the following plot:
 
+https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_partial_unoptimized_equal_lr/plot_epoch_099_generated.png
+
+![CHROHME unoptimized plot with equal LR](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_partial_unoptimized_equal_lr/plot_epoch_099_generated.png)
 
 Each of 16 columns in this plot corresponds to a different symbol class. In order, these symbols are: "(", ")", "+", "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "=", "x". For each column, the model makes 10 attempts to generate the corresponding symbol. We can see that for this dataset, the model does relatively poorly. For most symbols, it has an idea of what they are supposed to look like, but for some symbols ("-", "0", "1", for instance), most of the generated images are pretty bad.
 
@@ -29,21 +34,26 @@ Looking at the training logs for this run, I noticed that the generator loss was
 
 To fix this, I tried using a different learning rate for the generator and the discriminator (generator has 1.5x learning rate), which gave significantly improved results after the same number of epochs:
 
+![CHROHME unoptimized plot](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_partial_unoptimized/plot_epoch_099_generated.png)
 
 I also tried setting the generator to have 2x the learning rate of the discriminator, but the results seem to be about the same:
 
+![CHROHME unoptimized plot with 2x LR](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_partial_unoptimized_2x_lr/plot_epoch_099_generated.png)
 
 Another experiment I did relates to the aforementioned probability distribution of classes. Since some classes in my dataset contained 3x the data of other classes, I changed the class probability distribution used for training to weight classes based on the amount of training data they have. This ensures that data of each class is represented equally during training. 
 
 Using a generator learning rate 1.5x greater than the discriminator learning rate, the results I got using this method are shown in this plot of results after 100 epochs:
 
+![CHROHME optimized plot](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_full_optimized/plot_epoch_099_generated.png)
+
 
 As you would expect, the model now does better in generating images for classes that are poorly represented in the training data ("6", "7", "8", "9" are all examples, as they all have <1000 training data examples, whereas all the other classes have >2000). However, this appears to be at the cost of performance on other symbols, most clearly "0" in this case. Since model error was still decreasing at 100 epochs, it is likely that this result could be improved by increasing the number of epochs, but it still demonstrates the relative inefficiency of training using this method. The results are worse if the generator learning rate is 2x greater than the discriminator learning rate:
 
+![CHROHME optimized plot with 2x LR](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_partial_optimized_2x_lr/plot_epoch_099_generated.png)
 
 In sum, changing the class probability distribution appears to have mixed results. 
 
 ## Conclusion
 
-These small experiments were a great way to learn more about GANs, CNNs, Keras, and deploying models on Google Cloud Platform. There is still plenty of work to be done on improving the robustness and stability of GAN models. Authors have generally reported results only for low resolution (usually <= 128x128) images on relatively simple datasets, and a small change in dataset can completely break training, as I saw initially when I first replaced the MNIST dataset with the CROHME one. [This paper](https://arxiv.org/abs/1606.03498) shows some exciting efforts in this direction (co-authored by Ian Goodfellow, who invented GANs), and many more are sure to come.
+These small experiments were a great way to learn more about GANs, CNNs, Keras, and deploying models on Google Cloud Platform. There is still plenty of work to be done on improving the robustness and stability of GAN models. Authors have generally reported results only for low resolution (usually <= 128x128) images on relatively simple datasets, and a relatively small change in dataset can completely break training, as I saw initially when I first replaced the MNIST dataset with the CROHME one. [This paper](https://arxiv.org/abs/1606.03498) shows some exciting efforts in this direction (co-authored by Ian Goodfellow, who invented GANs), and many more are sure to come.
 
