@@ -4,7 +4,7 @@ The goal of this project is to learn more about and experiment with generative a
 
 ## GANs
 
-In brief, GANs work by training two networks: the generator G and the discriminator D. The generator generates images, and the discrimator is a binary classifier that determines whether a given image came from either the generator or the training data. The goal of the generator is to generate images that fool the discriminator into determining that they are real images. Initially, neither model is particularly good at its job, but the models are trained against each other so the discriminator gets better at telling generated images apart from training data while the generator gets better at fooling the discriminator. See [this article](https://medium.com/@ageitgey/abusing-generative-adversarial-networks-to-make-8-bit-pixel-art-e45d9b96cee7) for a visual explanation.
+In brief, GANs work by training two networks: the generator G and the discriminator D. The generator generates images, and the discrimator is a binary classifier that determines whether a given image came from either the generator or the training data. The goal of the generator is to generate images that fool the discriminator into classifying them as real images. Initially, neither model is particularly good at its job, but the models are trained against each other so the discriminator gets better at telling generated images apart from training data while the generator gets better at fooling the discriminator. See [this article](https://medium.com/@ageitgey/abusing-generative-adversarial-networks-to-make-8-bit-pixel-art-e45d9b96cee7) for a visual explanation.
 
 ## AC-GANs
 
@@ -22,34 +22,34 @@ The important properties of this dataset (for experimenting with the robustness 
 
 ## Experiments
 
-First, I ran the AC-GAN implementation as is on the new dataset. I had to change the Adam learning rate to 0.00005 from 0.0001 because model weights diverged otherwise. The results were significantly worse than on the MNIST dataset. After 100 epochs (around which the model errors began to hold roughly constant), we have the following plot:
+First, I ran the AC-GAN implementation as is on the new dataset. I had to change the Adam learning rate to 0.00005 from 0.0001 because model weights diverged otherwise. The results were significantly worse than on the MNIST dataset. After 200 epochs (around which the model errors held roughly constant), we have the following plot:
 
-![CHROHME unoptimized plot with equal LR](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_partial_unoptimized_equal_lr/plot_epoch_099_generated.png)
+![CHROHME unoptimized plot with equal LR](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_uniform_1/plot_epoch_199_generated.png)
 
-Each of 16 columns in this plot corresponds to a different symbol class. In order, these symbols are: "(", ")", "+", "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "=", "x". For each column, the model makes 10 attempts to generate the corresponding symbol. We can see that for this dataset, the model does relatively poorly. For most symbols, it has an idea of what they are supposed to look like, but for some symbols ("-", "0", "1", for instance), most of the generated images are pretty bad.
+Each of 16 columns in this plot corresponds to a different symbol class. In order, these symbols are: "(", ")", "+", "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "=", "x". For each column, the model makes 10 attempts to generate the corresponding symbol. We can see that for this dataset, the model does relatively poorly. For most symbols, it has an idea of what they are supposed to look like, but for symbols without much training data, the generated images are pretty bad ("6", "7", "8", "9" are all examples, as they all have <1000 training data examples, whereas all the other classes have >2000).
 
 Looking at the training logs for this run, I noticed that the generator loss was relatively high compared to the discriminator loss. Especially toward the beginning of training, it appeared that the discriminator was getting better, but the training step that modified the generator was working slower, and the generator was getting outpaced. This was true even though my implementation of AC-GAN training used the same number of examples (2 * batch size) to train both models at each step. This is an important consideration for the robustness of the model because if the generator does not get better fast enough, then the discriminator (which is competing with the generator) will not get better fast enough.
 
 To fix this, I tried using a different learning rate for the generator and the discriminator (generator has 1.5x learning rate), which gave significantly improved results after the same number of epochs:
 
-![CHROHME unoptimized plot](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_partial_unoptimized/plot_epoch_099_generated.png)
+![CHROHME unoptimized plot](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_uniform_1.5/plot_epoch_199_generated.png)
 
-Notice the variation within class for some of the generated images: some of the "4"s and "7"s are written differently.
+Notice that the results are much better for those less frequent symbols. Also notice the variation within class for some of the generated images: some of the "4"s and "7"s are written differently.
 
 I also tried setting the generator to have 2x the learning rate of the discriminator, but the results seem to be about the same:
 
-![CHROHME unoptimized plot with 2x LR](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_partial_unoptimized_2x_lr/plot_epoch_099_generated.png)
+![CHROHME unoptimized plot with 2x LR](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_uniform_2/plot_epoch_199_generated.png)
 
 Another experiment I did relates to the aforementioned probability distribution of classes. Since some classes in my dataset contained 3x the data of other classes, I changed the class probability distribution used for training to weight classes based on the amount of training data they have. This ensures that data of each class is represented equally during training. 
 
 Using a generator learning rate 1.5x greater than the discriminator learning rate, the results I got using this method are shown in this plot of results after 100 epochs:
 
-![CHROHME optimized plot](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_full_optimized/plot_epoch_099_generated.png)
+![CHROHME optimized plot](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_weighted_1.5/plot_epoch_199_generated.png)
 
 
-As you would expect, the model now does better in generating images for classes that are poorly represented in the training data ("6", "7", "8", "9" are all examples, as they all have <1000 training data examples, whereas all the other classes have >2000). However, this appears to be at the cost of performance on other symbols, most clearly "0" in this case. Since model error was still decreasing at 100 epochs, it is likely that this result could be improved by increasing the number of epochs, but it still demonstrates the relative inefficiency of training using this method. The results are a little worse if the generator learning rate is 2x greater than the discriminator learning rate:
+As you would expect, the model now does better in generating images for classes that are poorly represented in the training data ("6", "7", "8", "9"). However, this appears to be at the cost of performance on other symbols, most clearly "0" in this case. The results are worse if the generator learning rate is 2x greater than the discriminator learning rate:
 
-![CHROHME optimized plot with 2x LR](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_partial_optimized_2x_lr/plot_epoch_099_generated.png)
+![CHROHME optimized plot with 2x LR](https://github.com/karan1149/latex-writer/raw/master/model_outputs/outputs_weighted_2/plot_epoch_199_generated.png)
 
 In sum, changing the class probability distribution appears to have mixed results. 
 
